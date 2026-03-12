@@ -1,32 +1,24 @@
-// lib/prisma.ts
 import { PrismaClient } from '@prisma/client';
+import { PrismaPg } from '@prisma/adapter-pg';
+import { Pool } from 'pg';
 
-// Простая заглушка для сборки
-const prisma = (() => {
-  // Во время сборки возвращаем прокси, который не инициализирует клиент
-  if (
-    process.env.NODE_ENV === 'production' &&
-    process.env.NEXT_PHASE === 'phase-production-build'
-  ) {
-    return new Proxy({} as PrismaClient, {
-      get(target, prop) {
-        return async () => {
-          throw new Error('PrismaClient не должен использоваться во время сборки');
-        };
-      },
-    });
-  }
+const globalForPrisma = global as unknown as { prisma: PrismaClient };
 
-  // В рантайме создаем реальный клиент
-  const globalForPrisma = global as unknown as { prisma: PrismaClient };
+// Создаем пул соединений с базой данных, используя строку из переменных окружения
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+});
 
-  if (!globalForPrisma.prisma) {
-    globalForPrisma.prisma = new PrismaClient({
-      log: process.env.NODE_ENV === 'development' ? ['error'] : ['error'],
-    });
-  }
+// Создаем адаптер
+const adapter = new PrismaPg(pool);
 
-  return globalForPrisma.prisma;
-})();
+export const prisma =
+  globalForPrisma.prisma ||
+  new PrismaClient({
+    adapter, // <-- Передаем адаптер, как требует Prisma 7
+    log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
+  });
+
+if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
 
 export default prisma;
