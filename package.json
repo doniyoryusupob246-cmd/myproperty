@@ -12,6 +12,7 @@
   "dependencies": {
     "@prisma/client": "^7.5.0",
     "next": "16.1.6",
+    "node-telegram-bot-api": "^0.67.0",
     "react": "19.2.3",
     "react-dom": "19.2.3"
   },
