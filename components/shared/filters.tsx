@@ -77,7 +77,7 @@ export const Filters: React.FC<Props> = ({ className }) => {
   const handleSubmit = async () => {
     const tg = (window as any).Telegram?.WebApp;
     const user = tg?.initDataUnsafe?.user;
-    alert(user);
+    console.log(user);
   };
 
   return (
