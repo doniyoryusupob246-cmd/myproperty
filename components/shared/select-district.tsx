@@ -11,9 +11,10 @@ import { cn } from '@/lib/utils';
 
 interface Props {
   className?: string;
+  items: string[];
 }
 
-export const SelectDistrict: React.FC<Props> = ({ className }) => {
+export const SelectDistrict: React.FC<Props> = ({ items, className }) => {
   return (
     <div className={cn(className, 'flex justify-between items-center max-w-107.5 w-full mt-10')}>
       <h3 className="font-medium">Район</h3>
@@ -23,9 +24,11 @@ export const SelectDistrict: React.FC<Props> = ({ className }) => {
         </SelectTrigger>
         <SelectContent>
           <SelectGroup>
-            <SelectItem value="light">Light</SelectItem>
-            <SelectItem value="dark">Dark</SelectItem>
-            <SelectItem value="system">System</SelectItem>
+            {items.map((item) => (
+              <SelectItem key={item} value={item}>
+                {item}
+              </SelectItem>
+            ))}
           </SelectGroup>
         </SelectContent>
       </Select>
